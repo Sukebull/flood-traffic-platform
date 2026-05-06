@@ -1,0 +1,33 @@
+# 自己可以改端口号
+server:
+  port: 9999
+## 数据库配置
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://192.168.0.108:5432/floodTraffic
+#    #    url: jdbc:postgresql://localhost:5432/postgres
+#    username: postgres
+#    password: 123456
+#    driver-class-name: org.postgresql.Driver
+#mybatis:
+#  #  映射XML
+#  mapper-locations: classpath:mapper/*.xml
+#  configuration:
+#    #    配置日志  控制台标准输出
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    #    配置驼峰命名
+#    map-underscore-to-camel-case: true
+spring:
+  datasource:
+    # 数据库连接地址，请把 your_database_name 换成你实际建的库名
+    url: jdbc:postgresql://localhost:5432/flood_traffic_db
+    username: postgres   # 你的数据库用户名
+    password: 123456 # 你的数据库密码
+    driver-class-name: org.postgresql.Driver
+
+# MyBatis-Plus 的专属配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml # 告诉框架去哪里找你自己手写的 SQL XML 文件
+  configuration:
+    map-underscore-to-camel-case: true # 开启驼峰命名自动映射
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 在控制台打印生成的 SQL，方便你调试

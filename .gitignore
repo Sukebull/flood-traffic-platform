@@ -1,0 +1,13 @@
+﻿*.class
+.idea/
+.vscode/
+target/
+
+*.log
+*.tmp
+*.bak
+
+.mvn/wrapper/maven-wrapper.jar
+
+*.jar
+*.iml
