@@ -1,12 +1,16 @@
 package com.marvin.floodtrafficplatform.controller;
 
 import com.marvin.floodtrafficplatform.common.Result;
+import com.marvin.floodtrafficplatform.dto.OdCacheCheckDTO;
+import com.marvin.floodtrafficplatform.dto.OdCacheCheckResultDTO;
 import com.marvin.floodtrafficplatform.dto.TrafficSimParamDTO;
 import com.marvin.floodtrafficplatform.entity.TrafficSimulationTask;
 import com.marvin.floodtrafficplatform.service.TrafficSimulationTaskService;
 import com.marvin.floodtrafficplatform.service.impl.TrafficSimulationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +26,9 @@ public class TrafficSimulationController {
 
     @Autowired
     private TrafficSimulationTaskService trafficTaskService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @PostMapping("/start")
     public Result<Map<String, String>> startSimulation(@RequestBody TrafficSimParamDTO paramDTO) {
@@ -82,5 +89,34 @@ public class TrafficSimulationController {
             trafficTaskService.updateById(task);
         }
         return Result.success("status updated");
+    }
+
+    @PostMapping("/check-od-cache")
+    public Result<OdCacheCheckResultDTO> checkOdCache(@RequestBody OdCacheCheckDTO checkDTO) {
+        try {
+            String pythonUrl = "http://localhost:8000/api/traffic/check-od-cache";
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("bounds", checkDTO.getBounds());
+            payload.put("gridSizeKm", checkDTO.getGridSizeKm());
+            payload.put("originKeyword", checkDTO.getOriginKeyword());
+            payload.put("destinationKeyword", checkDTO.getDestinationKeyword());
+            payload.put("poiSearchRadiusMeters", checkDTO.getPoiSearchRadiusMeters());
+            payload.put("beta", checkDTO.getBeta());
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonUrl, payload, Map.class);
+            Map<String, Object> responseBody = response.getBody();
+            Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+
+            OdCacheCheckResultDTO result = new OdCacheCheckResultDTO();
+            result.setCacheHit((Boolean) data.get("cacheHit"));
+            result.setPoiCached((Boolean) data.get("poiCached"));
+            result.setTazCached((Boolean) data.get("tazCached"));
+            result.setOdCached((Boolean) data.get("odCached"));
+            result.setMessage((String) data.get("message"));
+
+            return Result.success(result);
+        } catch (Exception e) {
+            return Result.error(500, "缓存状态查询失败: " + e.getMessage());
+        }
     }
 }

@@ -17,4 +17,5 @@ public class OdDemandDTO {
     private Integer randomSeed;
     private Boolean sleepBetweenRequests;
     private Double requestIntervalSeconds;
+    private Boolean forceRefresh;
 }
