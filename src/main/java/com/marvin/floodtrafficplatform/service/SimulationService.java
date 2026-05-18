@@ -1,6 +1,7 @@
 package com.marvin.floodtrafficplatform.service;
 
 import com.marvin.floodtrafficplatform.dto.SimulationParamDTO;
+import java.util.List;
 import java.util.Map;
 
 public interface SimulationService {
@@ -12,4 +13,7 @@ public interface SimulationService {
 
     // 获取管道节点溢流数据的方法
     Map<String, Object> getNodeOverflowData(String taskId, String nodeId);
+
+    // 获取指定任务下所有存在溢流的管点 ID 列表
+    List<String> getOverflowedNodeIds(String taskId);
 }

@@ -120,4 +120,31 @@ public class SimulationServiceImpl implements SimulationService {
         }
         return map;
     }
+
+    // ================= 批量获取存在溢流的管点 ID 列表 =================
+    @Override
+    public List<String> getOverflowedNodeIds(String taskId) {
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.marvin.floodtrafficplatform.entity.NodeOverflowResult> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        queryWrapper.eq(com.marvin.floodtrafficplatform.entity.NodeOverflowResult::getTaskId, taskId);
+
+        List<com.marvin.floodtrafficplatform.entity.NodeOverflowResult> results = nodeOverflowResultMapper.selectList(queryWrapper);
+
+        List<String> overflowedIds = new java.util.ArrayList<>();
+        for (com.marvin.floodtrafficplatform.entity.NodeOverflowResult result : results) {
+            List<Double> inflows = result.getInflowSeries();
+            if (inflows != null && !inflows.isEmpty()) {
+                boolean hasOverflow = false;
+                for (Double val : inflows) {
+                    if (val != null && val > 0) {
+                        hasOverflow = true;
+                        break;
+                    }
+                }
+                if (hasOverflow) {
+                    overflowedIds.add(result.getNodeId());
+                }
+            }
+        }
+        return overflowedIds;
+    }
 }

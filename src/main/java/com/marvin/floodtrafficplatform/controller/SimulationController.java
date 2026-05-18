@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -81,5 +82,12 @@ public class SimulationController {
             return Result.success("delete success");
         }
         return Result.error("delete failed");
+    }
+
+    // 7. 查询指定任务下所有存在溢流的管点 ID 列表
+    @GetMapping("/result/nodes/{taskId}/overflowed")
+    public Result<List<String>> getOverflowedNodeIds(@PathVariable String taskId) {
+        List<String> nodeIds = simulationService.getOverflowedNodeIds(taskId);
+        return Result.success(nodeIds);
     }
 }
