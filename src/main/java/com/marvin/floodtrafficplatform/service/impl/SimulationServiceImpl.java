@@ -1,11 +1,14 @@
 package com.marvin.floodtrafficplatform.service.impl;
 
 import com.marvin.floodtrafficplatform.dto.SimulationParamDTO;
+import com.marvin.floodtrafficplatform.entity.NodeOverflowResult;
 import com.marvin.floodtrafficplatform.service.SimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 @Service
@@ -127,7 +130,7 @@ public class SimulationServiceImpl implements SimulationService {
         com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.marvin.floodtrafficplatform.entity.NodeOverflowResult> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
         queryWrapper.eq(com.marvin.floodtrafficplatform.entity.NodeOverflowResult::getTaskId, taskId);
 
-        List<com.marvin.floodtrafficplatform.entity.NodeOverflowResult> results = nodeOverflowResultMapper.selectList(queryWrapper);
+        List<NodeOverflowResult> results = nodeOverflowResultMapper.selectList(queryWrapper);
 
         List<String> overflowedIds = new java.util.ArrayList<>();
         for (com.marvin.floodtrafficplatform.entity.NodeOverflowResult result : results) {
