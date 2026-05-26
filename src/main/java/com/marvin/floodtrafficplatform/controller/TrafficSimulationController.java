@@ -144,6 +144,44 @@ public class TrafficSimulationController {
         }
     }
 
+    // 删除指定交通仿真任务（同步删除数据库记录与本地产物）
+    @DeleteMapping("/task/{taskId}")
+    public Result<String> deleteTask(@PathVariable String taskId) {
+        TrafficSimulationTask task = trafficTaskService.getTaskById(taskId);
+        if (task == null) {
+            return Result.error(404, "task not found");
+        }
+        boolean dbDeleted = trafficTaskService.removeById(taskId);
+        if (dbDeleted) {
+            // 删除本地产物目录
+            try {
+                java.io.File pythonProjectDir = new java.io.File("D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d");
+                java.io.File taskDir = new java.io.File(pythonProjectDir, "data/trafficTasks/" + taskId);
+                if (taskDir.exists() && taskDir.isDirectory()) {
+                    deleteDirectory(taskDir);
+                }
+            } catch (Exception e) {
+                System.err.println("删除交通仿真本地目录失败: " + e.getMessage());
+            }
+            return Result.success("delete success");
+        }
+        return Result.error("delete failed");
+    }
+
+    private void deleteDirectory(java.io.File dir) {
+        java.io.File[] files = dir.listFiles();
+        if (files != null) {
+            for (java.io.File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        dir.delete();
+    }
+
     // ================= 断点续跑接口 =================
     @GetMapping("/checkpoint/{taskId}")
     public Result<Map<String, Object>> getCheckpoint(@PathVariable String taskId) {
