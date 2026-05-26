@@ -13,6 +13,7 @@ import com.marvin.floodtrafficplatform.entity.TrafficSimulationTask;
 import com.marvin.floodtrafficplatform.mapper.TrafficSimulationTaskMapper;
 import com.marvin.floodtrafficplatform.service.TrafficSimulationTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -211,5 +212,37 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
 
         queryWrapper.orderByDesc(TrafficSimulationTask::getCreateTime);
         return list(queryWrapper);
+    }
+
+    // ================= 查询交通仿真断点状态 =================
+    @Override
+    public Map<String, Object> getCheckpoint(String taskId) {
+        try {
+            String url = "http://localhost:8000/api/traffic/checkpoint/" + taskId;
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            return response.getBody();
+        } catch (Exception e) {
+            System.err.println("❌ 查询交通仿真断点状态失败: " + e.getMessage());
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("status", "error");
+            errorMap.put("message", "查询断点状态失败: " + e.getMessage());
+            return errorMap;
+        }
+    }
+
+    // ================= 发起交通仿真断点续跑 =================
+    @Override
+    public Map<String, Object> resumeSimulation(String taskId) {
+        try {
+            String url = "http://localhost:8000/api/traffic/resume/" + taskId;
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, null, Map.class);
+            return response.getBody();
+        } catch (Exception e) {
+            System.err.println("❌ 交通仿真断点续跑请求失败: " + e.getMessage());
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("status", "error");
+            errorMap.put("message", "断点续跑请求失败: " + e.getMessage());
+            return errorMap;
+        }
     }
 }

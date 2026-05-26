@@ -16,4 +16,13 @@ public interface SimulationService {
 
     // 获取指定任务下所有存在溢流的管点 ID 列表
     List<String> getOverflowedNodeIds(String taskId);
+
+    // 查询任务断点状态
+    Map<String, Object> getCheckpoint(String taskId);
+
+    // 发起断点续跑
+    Map<String, Object> resumeSimulation(String taskId);
+
+    // 删除任务本地产物目录
+    boolean deleteTaskLocalFiles(String taskId);
 }

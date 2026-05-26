@@ -150,4 +150,73 @@ public class SimulationServiceImpl implements SimulationService {
         }
         return overflowedIds;
     }
+
+    // ================= 查询断点状态 =================
+    @Override
+    public Map<String, Object> getCheckpoint(String taskId) {
+        try {
+            String url = PYTHON_API_URL + "/checkpoint/" + taskId;
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            return response.getBody();
+        } catch (Exception e) {
+            System.err.println("❌ 查询断点状态失败: " + e.getMessage());
+            Map<String, Object> errorMap = new java.util.HashMap<>();
+            errorMap.put("status", "error");
+            errorMap.put("message", "查询断点状态失败: " + e.getMessage());
+            return errorMap;
+        }
+    }
+
+    // ================= 发起断点续跑 =================
+    @Override
+    public Map<String, Object> resumeSimulation(String taskId) {
+        try {
+            String url = PYTHON_API_URL + "/resume/" + taskId;
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, null, Map.class);
+            return response.getBody();
+        } catch (Exception e) {
+            System.err.println("❌ 断点续跑请求失败: " + e.getMessage());
+            Map<String, Object> errorMap = new java.util.HashMap<>();
+            errorMap.put("status", "error");
+            errorMap.put("message", "断点续跑请求失败: " + e.getMessage());
+            return errorMap;
+        }
+    }
+
+    // ================= 删除任务本地产物目录 =================
+    @Override
+    public boolean deleteTaskLocalFiles(String taskId) {
+        try {
+            // Python 项目根目录（与 Java 项目同级）
+            java.io.File pythonProjectDir = new java.io.File("D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d");
+            String[] subDirs = {"data/swmm_tasks", "data/csvtest", "data/output", "data/outtif"};
+            boolean anyDeleted = false;
+            for (String sub : subDirs) {
+                java.io.File dir = new java.io.File(pythonProjectDir, sub + "/" + taskId);
+                if (dir.exists() && dir.isDirectory()) {
+                    deleteDirectory(dir);
+                    System.out.println("🗑️ 已删除目录: " + dir.getAbsolutePath());
+                    anyDeleted = true;
+                }
+            }
+            return anyDeleted;
+        } catch (Exception e) {
+            System.err.println("❌ 删除本地文件失败: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void deleteDirectory(java.io.File dir) {
+        java.io.File[] files = dir.listFiles();
+        if (files != null) {
+            for (java.io.File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        dir.delete();
+    }
 }

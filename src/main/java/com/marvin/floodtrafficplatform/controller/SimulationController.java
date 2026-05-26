@@ -74,11 +74,12 @@ public class SimulationController {
         return Result.success(task);
     }
 
-    // 6. 删除指定内涝仿真任务
+    // 6. 删除指定内涝仿真任务（同步删除数据库记录与本地产物）
     @DeleteMapping("/task/{taskId}")
     public Result<String> deleteTask(@PathVariable String taskId) {
-        boolean success = taskService.removeById(taskId);
-        if (success) {
+        boolean dbDeleted = taskService.removeById(taskId);
+        if (dbDeleted) {
+            simulationService.deleteTaskLocalFiles(taskId);
             return Result.success("delete success");
         }
         return Result.error("delete failed");
@@ -89,5 +90,19 @@ public class SimulationController {
     public Result<List<String>> getOverflowedNodeIds(@PathVariable String taskId) {
         List<String> nodeIds = simulationService.getOverflowedNodeIds(taskId);
         return Result.success(nodeIds);
+    }
+
+    // 8. 查询任务断点状态
+    @GetMapping("/checkpoint/{taskId}")
+    public Result<Map<String, Object>> getCheckpoint(@PathVariable String taskId) {
+        Map<String, Object> data = simulationService.getCheckpoint(taskId);
+        return Result.success(data);
+    }
+
+    // 9. 发起断点续跑
+    @PostMapping("/resume/{taskId}")
+    public Result<Map<String, Object>> resumeSimulation(@PathVariable String taskId) {
+        Map<String, Object> data = simulationService.resumeSimulation(taskId);
+        return Result.success(data);
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,5 +120,40 @@ public class TrafficSimulationController {
         } catch (Exception e) {
             return Result.error(500, "缓存状态查询失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 查询任务原始参数（供 Python 断点续跑回查使用）
+     */
+    @GetMapping("/task/{taskId}/params")
+    public Result<Map<String, Object>> getTaskParams(@PathVariable String taskId) {
+        TrafficSimulationTask task = trafficTaskService.getTaskById(taskId);
+        if (task == null) {
+            return Result.error(404, "task not found");
+        }
+        String parameters = task.getParameters();
+        if (parameters == null || parameters.isEmpty()) {
+            return Result.error(404, "task parameters not found");
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> paramsMap = mapper.readValue(parameters, Map.class);
+            return Result.success(paramsMap);
+        } catch (Exception e) {
+            return Result.error(500, "参数解析失败: " + e.getMessage());
+        }
+    }
+
+    // ================= 断点续跑接口 =================
+    @GetMapping("/checkpoint/{taskId}")
+    public Result<Map<String, Object>> getCheckpoint(@PathVariable String taskId) {
+        Map<String, Object> data = trafficService.getCheckpoint(taskId);
+        return Result.success(data);
+    }
+
+    @PostMapping("/resume/{taskId}")
+    public Result<Map<String, Object>> resumeSimulation(@PathVariable String taskId) {
+        Map<String, Object> data = trafficService.resumeSimulation(taskId);
+        return Result.success(data);
     }
 }
