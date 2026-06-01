@@ -106,6 +106,18 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
         } else {
             validateRandomDemand(demandDTO);
         }
+
+        validateVehicleTypes(paramDTO.getVehicleTypes());
+    }
+
+    private void validateVehicleTypes(java.util.Map<String, Double> vehicleTypes) {
+        if (vehicleTypes == null || vehicleTypes.isEmpty()) {
+            return; // 未传时后端使用默认单车型
+        }
+        double total = vehicleTypes.values().stream().mapToDouble(Double::doubleValue).sum();
+        if (Math.abs(total - 1.0) > 0.001) {
+            throw new IllegalArgumentException("车型比例总和必须为 1.0（100%），当前为 " + String.format("%.2f", total));
+        }
     }
 
     private void validateRandomDemand(TrafficDemandDTO demandDTO) {

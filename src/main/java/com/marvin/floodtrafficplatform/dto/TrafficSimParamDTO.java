@@ -1,6 +1,7 @@
 package com.marvin.floodtrafficplatform.dto;
 
 import lombok.Data;
+import java.util.Map;
 
 @Data
 public class TrafficSimParamDTO {
@@ -12,4 +13,5 @@ public class TrafficSimParamDTO {
     private TrafficDemandDTO trafficDemand;
     private OdDemandDTO odDemand;
     private SignalControlDTO signalControl;
+    private Map<String, Double> vehicleTypes;
 }
