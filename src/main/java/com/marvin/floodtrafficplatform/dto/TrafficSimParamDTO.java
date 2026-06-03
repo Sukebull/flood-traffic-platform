@@ -14,4 +14,5 @@ public class TrafficSimParamDTO {
     private OdDemandDTO odDemand;
     private SignalControlDTO signalControl;
     private Map<String, Double> vehicleTypes;
+    private Map<String, Map<String, String>> vehicleTypeParams;
 }
