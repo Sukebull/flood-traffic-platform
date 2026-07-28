@@ -15,4 +15,8 @@ public class CustomTimingDTO {
 
     // 该路口包含的具体红绿灯相位列表
     private List<PhaseDTO> phases;
+
+    // P0-4: 信号相位偏移量（秒），用于多路口绿波协调
+    // 之前该字段前端有发、DTO 无定义被静默丢弃，Python 端永远拿到 0
+    private Integer offset;
 }

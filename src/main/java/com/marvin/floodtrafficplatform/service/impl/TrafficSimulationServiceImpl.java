@@ -39,6 +39,9 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
     @Autowired
     private ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Value("${python.base-url:http://localhost:8000}")
+    private String pythonBaseUrl;
+
     public String submitTrafficTask(TrafficSimParamDTO paramDTO) {
         validateParamDTO(paramDTO);
 
@@ -62,7 +65,7 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
         payload.put("taskId", taskId);
         payload.put("sumoParams", paramDTO);
 
-        String pythonUrl = "http://localhost:8000/api/traffic/build-and-run";
+        String pythonUrl = pythonBaseUrl + "/api/traffic/build-and-run";
         try {
             restTemplate.postForEntity(pythonUrl, payload, String.class);
             task.setStatus("RUNNING");
@@ -71,6 +74,8 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
             task.setStatus("FAILED");
             task.setErrorMessage("Python service call failed: " + e.getMessage());
             trafficMapper.updateById(task);
+            // P1-1: 如实上抛 —— 原先吞掉异常仍返回 taskId，Controller 回 status:"running" 误导前端
+            throw new RuntimeException("Python 仿真服务不可达，任务已标记 FAILED: " + e.getMessage(), e);
         }
 
         return taskId;

@@ -28,8 +28,13 @@ public class SimulationServiceImpl implements SimulationService {
     private com.marvin.floodtrafficplatform.mapper.NodeOverflowResultMapper nodeOverflowResultMapper;
     // ================================================================
 
-    // 假设你的 Python FastAPI 运行在本机的 8000 端口
-    private final String PYTHON_API_URL = "http://localhost:8000/api/simulation";
+    // P1-3: Python FastAPI 地址统一走 application.yml（原硬编码 localhost:8000）
+    @org.springframework.beans.factory.annotation.Value("${python.base-url:http://localhost:8000}")
+    private String pythonBaseUrl;
+
+    private String pythonApiUrl() {
+        return pythonBaseUrl + "/api/simulation";
+    }
     // ================= 自动化仿真方法实现 =================
     @Override
     public Map<String, Object> startPythonSimulation(SimulationParamDTO params) {
@@ -45,7 +50,7 @@ public class SimulationServiceImpl implements SimulationService {
             }
 
             // 这里拼接 "/start" 后，完整的 URL 刚好是正确的
-            ResponseEntity<Map> response = restTemplate.postForEntity(PYTHON_API_URL + "/start", params, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonApiUrl() + "/start", params, Map.class);
 
             // 获取 Python 返回的字典
             Map<String, Object> responseBody = response.getBody();
@@ -90,7 +95,7 @@ public class SimulationServiceImpl implements SimulationService {
     public Map<String, Object> getSimulationProgress(String taskId) {
         try {
             // 拼装查询进度的 URL
-            String url = PYTHON_API_URL + "/progress/" + taskId;
+            String url = pythonApiUrl() + "/progress/" + taskId;
             // 发起 GET 请求
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
             return response.getBody();
@@ -155,7 +160,7 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public Map<String, Object> getCheckpoint(String taskId) {
         try {
-            String url = PYTHON_API_URL + "/checkpoint/" + taskId;
+            String url = pythonApiUrl() + "/checkpoint/" + taskId;
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
             return response.getBody();
         } catch (Exception e) {
@@ -171,7 +176,7 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public Map<String, Object> resumeSimulation(String taskId) {
         try {
-            String url = PYTHON_API_URL + "/resume/" + taskId;
+            String url = pythonApiUrl() + "/resume/" + taskId;
             ResponseEntity<Map> response = restTemplate.postForEntity(url, null, Map.class);
             return response.getBody();
         } catch (Exception e) {

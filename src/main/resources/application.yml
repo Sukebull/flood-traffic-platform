@@ -25,6 +25,11 @@ spring:
     password: 123456 # 你的数据库密码
     driver-class-name: org.postgresql.Driver
 
+# P1-3: Python 仿真引擎地址与项目目录统一配置（原先硬编码散落 Controller/Service）
+python:
+  base-url: http://localhost:8000
+  project-dir: D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d
+
 # MyBatis-Plus 的专属配置
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml # 告诉框架去哪里找你自己手写的 SQL XML 文件

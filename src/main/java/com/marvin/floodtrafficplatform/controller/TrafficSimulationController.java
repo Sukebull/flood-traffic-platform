@@ -32,6 +32,12 @@ public class TrafficSimulationController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @org.springframework.beans.factory.annotation.Value("${python.base-url:http://localhost:8000}")
+    private String pythonBaseUrl;
+
+    @org.springframework.beans.factory.annotation.Value("${python.project-dir:D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d}")
+    private String pythonProjectDir;
+
     @PostMapping("/start")
     public Result<Map<String, String>> startSimulation(@RequestBody TrafficSimParamDTO paramDTO) {
         try {
@@ -81,7 +87,11 @@ public class TrafficSimulationController {
 
         TrafficSimulationTask task = trafficTaskService.getTaskById(taskId);
         if (task != null) {
-            task.setStatus(status);
+            // P1-4: 状态统一大写入库，避免 Java(PENDING/RUNNING) 与 Python(SUCCESS/FAILED)
+            // 之外再混入小写/变体状态
+            if (status != null) {
+                task.setStatus(status.trim().toUpperCase());
+            }
             if (resultPath != null) {
                 task.setResultPath(resultPath);
             }
@@ -96,7 +106,7 @@ public class TrafficSimulationController {
     @PostMapping("/check-od-cache")
     public Result<OdCacheCheckResultDTO> checkOdCache(@RequestBody OdCacheCheckDTO checkDTO) {
         try {
-            String pythonUrl = "http://localhost:8000/api/traffic/check-od-cache";
+            String pythonUrl = pythonBaseUrl + "/api/traffic/check-od-cache";
             Map<String, Object> payload = new HashMap<>();
             payload.put("bounds", checkDTO.getBounds());
             payload.put("gridSizeKm", checkDTO.getGridSizeKm());
@@ -155,7 +165,6 @@ public class TrafficSimulationController {
         if (dbDeleted) {
             // 删除本地产物目录
             try {
-                java.io.File pythonProjectDir = new java.io.File("D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d");
                 java.io.File taskDir = new java.io.File(pythonProjectDir, "data/trafficTasks/" + taskId);
                 if (taskDir.exists() && taskDir.isDirectory()) {
                     deleteDirectory(taskDir);
