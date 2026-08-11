@@ -16,4 +16,7 @@ public class SwmmParamDTO {
     // SWMM 时长控制参数
     private Integer durationMinutes; // SWMM 总模拟时长 (min)
     private Integer reportStepSeconds; // SWMM 输出步长 (s)
+
+    // T5: 显式关闭 ponding（小雨场景防 DYNWAVE 数值爆破）；null=按耦合模式默认
+    private Boolean allowPonding;
 }
