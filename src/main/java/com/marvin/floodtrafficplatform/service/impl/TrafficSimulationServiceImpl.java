@@ -235,7 +235,7 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
     @Override
     public Map<String, Object> getCheckpoint(String taskId) {
         try {
-            String url = "http://localhost:8000/api/traffic/checkpoint/" + taskId;
+            String url = pythonBaseUrl + "/api/traffic/checkpoint/" + taskId;
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
             return response.getBody();
         } catch (Exception e) {
@@ -251,7 +251,7 @@ public class TrafficSimulationServiceImpl extends ServiceImpl<TrafficSimulationT
     @Override
     public Map<String, Object> resumeSimulation(String taskId) {
         try {
-            String url = "http://localhost:8000/api/traffic/resume/" + taskId;
+            String url = pythonBaseUrl + "/api/traffic/resume/" + taskId;
             ResponseEntity<Map> response = restTemplate.postForEntity(url, null, Map.class);
             return response.getBody();
         } catch (Exception e) {

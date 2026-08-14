@@ -27,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/data-manager")
 public class DataManagerController {
 
-    @Value("${python.service.url:http://localhost:8000}")
+    @Value("${python.base-url:http://localhost:8000}")
     private String pythonServiceUrl;
 
     @Autowired
