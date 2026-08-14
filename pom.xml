@@ -80,7 +80,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.marvin.floodtrafficplatform.FloodTrafficPlatformApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>

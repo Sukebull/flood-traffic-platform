@@ -1,4 +1,4 @@
-﻿*.class
+*.class
 .idea/
 .vscode/
 target/
@@ -11,3 +11,8 @@ target/
 
 *.jar
 *.iml
+
+# Spring Initializr 模板残留与本地私有配置
+HELP.md
+application-local.yml
+*.versionsBackup
