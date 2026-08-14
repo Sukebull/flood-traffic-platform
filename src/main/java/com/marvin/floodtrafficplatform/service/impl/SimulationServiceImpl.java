@@ -32,6 +32,10 @@ public class SimulationServiceImpl implements SimulationService {
     @org.springframework.beans.factory.annotation.Value("${python.base-url:http://localhost:8000}")
     private String pythonBaseUrl;
 
+    // Python 项目根目录统一走 application.yml 的 python.project-dir（原硬编码本机绝对路径）
+    @org.springframework.beans.factory.annotation.Value("${python.project-dir:}")
+    private String pythonProjectDir;
+
     private String pythonApiUrl() {
         return pythonBaseUrl + "/api/simulation";
     }
@@ -192,12 +196,18 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public boolean deleteTaskLocalFiles(String taskId) {
         try {
-            // Python 项目根目录（与 Java 项目同级）
-            java.io.File pythonProjectDir = new java.io.File("D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d");
+            // Python 项目根目录走配置 python.project-dir（环境变量 PYTHON_PROJECT_DIR）。
+            // 兜底行为：未配置时跳过本地目录删除（仅删库记录），避免误删未知路径；
+            // 配置后行为与原硬编码路径完全等价。
+            if (pythonProjectDir == null || pythonProjectDir.trim().isEmpty()) {
+                System.out.println("⚠️ python.project-dir 未配置，跳过删除任务本地产物目录");
+                return false;
+            }
+            java.io.File pythonProjectDirFile = new java.io.File(pythonProjectDir);
             String[] subDirs = {"data/swmm_tasks", "data/csvtest", "data/output", "data/outtif"};
             boolean anyDeleted = false;
             for (String sub : subDirs) {
-                java.io.File dir = new java.io.File(pythonProjectDir, sub + "/" + taskId);
+                java.io.File dir = new java.io.File(pythonProjectDirFile, sub + "/" + taskId);
                 if (dir.exists() && dir.isDirectory()) {
                     deleteDirectory(dir);
                     System.out.println("🗑️ 已删除目录: " + dir.getAbsolutePath());

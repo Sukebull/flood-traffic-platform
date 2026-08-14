@@ -35,7 +35,8 @@ public class TrafficSimulationController {
     @org.springframework.beans.factory.annotation.Value("${python.base-url:http://localhost:8000}")
     private String pythonBaseUrl;
 
-    @org.springframework.beans.factory.annotation.Value("${python.project-dir:D:/BaiduSyncdisk/GraduateSource/Research/Major/main/swmm-wca2d}")
+    // Python 项目根目录，默认空；未配置时删除任务仅删库记录，不动本地目录
+    @org.springframework.beans.factory.annotation.Value("${python.project-dir:}")
     private String pythonProjectDir;
 
     @PostMapping("/start")
@@ -163,11 +164,13 @@ public class TrafficSimulationController {
         }
         boolean dbDeleted = trafficTaskService.removeById(taskId);
         if (dbDeleted) {
-            // 删除本地产物目录
+            // 删除本地产物目录；python.project-dir 未配置时跳过，避免按相对路径误删
             try {
-                java.io.File taskDir = new java.io.File(pythonProjectDir, "data/trafficTasks/" + taskId);
-                if (taskDir.exists() && taskDir.isDirectory()) {
-                    deleteDirectory(taskDir);
+                if (pythonProjectDir != null && !pythonProjectDir.trim().isEmpty()) {
+                    java.io.File taskDir = new java.io.File(pythonProjectDir, "data/trafficTasks/" + taskId);
+                    if (taskDir.exists() && taskDir.isDirectory()) {
+                        deleteDirectory(taskDir);
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("删除交通仿真本地目录失败: " + e.getMessage());

@@ -1,0 +1,24 @@
+# ============================================================
+# application.yml.example — flood-traffic-platform 环境变量说明
+# 实际配置在 src/main/resources/application.yml 中通过 ${VAR:默认值} 读取，
+# 以下环境变量可在启动前导出（或写入本地未被 git 跟踪的 application-local.yml）。
+# ============================================================
+
+# ---------- 数据库（PostgreSQL） ----------
+# 数据库主机地址，默认 localhost
+DB_HOST=localhost
+# 数据库端口，默认 5432
+DB_PORT=5432
+# 数据库名，默认 flood_traffic_db（需先用 db/schema.sql 初始化）
+DB_NAME=flood_traffic_db
+# 数据库用户名，默认 postgres
+DB_USERNAME=postgres
+# 数据库密码，默认为空（必须显式设置）
+DB_PASSWORD=your_password_here
+
+# ---------- Python 算法引擎 ----------
+# 算法引擎（FastAPI）地址，默认 http://localhost:8000
+PYTHON_BASE_URL=http://localhost:8000
+# 算法引擎项目根目录的绝对路径（用于删除仿真任务本地产物），默认为空
+# 例：PYTHON_PROJECT_DIR=/path/to/swmm-wca2d
+PYTHON_PROJECT_DIR=
